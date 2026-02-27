@@ -1,0 +1,94 @@
+/**
+ * GothamClean - Content Styles
+ *
+ * Minimal styling for replaced titles to indicate they've been cleaned.
+ * Designed to feel native to YouTube's UI.
+ */
+
+/* Subtle indicator for replaced titles */
+[data-gothamclean-replaced="true"] {
+  position: relative;
+}
+
+/* Optional: Small dot indicator before replaced titles */
+[data-gothamclean-replaced="true"]::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: linear-gradient(135deg, #4a9eff, #7c3aed);
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* Tag color coding for different categories */
+/* These work by detecting the tag text at the start of titles */
+
+/* Recap - Blue */
+[data-gothamclean-replaced="true"][title^="[Recap]"]::before,
+[data-gothamclean-replaced="true"]:has(> :first-child:contains("[Recap]"))::before {
+  background: #3b82f6;
+}
+
+/* Lesson - Green */
+[data-gothamclean-replaced="true"][title^="[Lesson]"]::before {
+  background: #22c55e;
+}
+
+/* Guess the Elo - Orange */
+[data-gothamclean-replaced="true"][title^="[Guess the Elo]"]::before {
+  background: #f97316;
+}
+
+/* News - Red */
+[data-gothamclean-replaced="true"][title^="[News]"]::before {
+  background: #ef4444;
+}
+
+/* Challenge - Purple */
+[data-gothamclean-replaced="true"][title^="[Challenge]"]::before {
+  background: #a855f7;
+}
+
+/* Collab - Pink */
+[data-gothamclean-replaced="true"][title^="[Collab]"]::before {
+  background: #ec4899;
+}
+
+/* Road to GM - Gold */
+[data-gothamclean-replaced="true"][title^="[Road to GM]"]::before {
+  background: #eab308;
+}
+
+/* Tournament - Teal */
+[data-gothamclean-replaced="true"][title^="[Tournament]"]::before {
+  background: #14b8a6;
+}
+
+/* Hover effect to show original title (optional enhancement) */
+[data-gothamclean-replaced="true"]:hover {
+  cursor: help;
+}
+
+/* Tooltip showing original title on hover */
+[data-gothamclean-replaced="true"][data-gothamclean-original]:hover::after {
+  content: "Original: " attr(data-gothamclean-original);
+  position: absolute;
+  left: 0;
+  top: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 10000;
+  pointer-events: none;
+  margin-top: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}

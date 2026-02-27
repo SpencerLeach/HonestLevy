@@ -1,0 +1,25 @@
+# API keys - never commit
+api keys.txt
+run_pipeline.py
+*.env
+.env*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+
+# Backfill progress (can be large, regenerated)
+pipeline/backfill_progress.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
