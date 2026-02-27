@@ -1,5 +1,5 @@
 /**
- * GothamClean - Popup Script
+ * HonestLevy - Popup Script
  */
 
 // DOM elements

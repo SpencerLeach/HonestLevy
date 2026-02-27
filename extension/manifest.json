@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "GothamClean",
+  "name": "HonestLevy",
   "version": "1.0.0",
-  "description": "Replaces GothamChess clickbait titles with accurate, descriptive ones.",
+  "description": "Replaces GothamChess clickbait titles with accurate, descriptive ones. Honest titles for Levy's videos.",
   "permissions": ["storage", "alarms"],
   "host_permissions": ["https://www.youtube.com/*"],
   "background": {

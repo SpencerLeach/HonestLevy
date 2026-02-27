@@ -1,5 +1,5 @@
 /**
- * GothamClean - Background Service Worker
+ * HonestLevy - Background Service Worker
  *
  * Fetches and caches the titles.json mapping from GitHub.
  * Refreshes every 6 hours to pick up new titles.
@@ -15,7 +15,7 @@ const ALARM_NAME = 'refreshTitles';
  */
 async function fetchAndCacheTitles() {
   try {
-    console.log('[GothamClean] Fetching titles from GitHub...');
+    console.log('[HonestLevy] Fetching titles from GitHub...');
 
     const response = await fetch(TITLES_JSON_URL, {
       cache: 'no-store'  // Bypass cache to get fresh data
@@ -34,11 +34,11 @@ async function fetchAndCacheTitles() {
       titleCount: titleCount
     });
 
-    console.log(`[GothamClean] Cached ${titleCount} titles`);
+    console.log(`[HonestLevy] Cached ${titleCount} titles`);
     return true;
 
   } catch (error) {
-    console.error('[GothamClean] Failed to fetch titles:', error);
+    console.error('[HonestLevy] Failed to fetch titles:', error);
     return false;
   }
 }
@@ -47,7 +47,7 @@ async function fetchAndCacheTitles() {
  * Initialize the extension on install
  */
 chrome.runtime.onInstalled.addListener(async (details) => {
-  console.log('[GothamClean] Extension installed/updated:', details.reason);
+  console.log('[HonestLevy] Extension installed/updated:', details.reason);
 
   // Set default settings
   await chrome.storage.local.set({
@@ -70,7 +70,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
  */
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === ALARM_NAME) {
-    console.log('[GothamClean] Periodic refresh triggered');
+    console.log('[HonestLevy] Periodic refresh triggered');
     await fetchAndCacheTitles();
   }
 });
@@ -110,7 +110,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
  * On startup, ensure we have titles cached
  */
 chrome.runtime.onStartup.addListener(async () => {
-  console.log('[GothamClean] Browser started');
+  console.log('[HonestLevy] Browser started');
 
   const result = await chrome.storage.local.get(['titles', 'lastUpdated']);
 

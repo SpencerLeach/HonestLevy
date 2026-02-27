@@ -1,17 +1,17 @@
 /**
- * GothamClean - Content Styles
+ * HonestLevy - Content Styles
  *
  * Minimal styling for replaced titles to indicate they've been cleaned.
  * Designed to feel native to YouTube's UI.
  */
 
 /* Subtle indicator for replaced titles */
-[data-gothamclean-replaced="true"] {
+[data-honestlevy-replaced="true"] {
   position: relative;
 }
 
 /* Optional: Small dot indicator before replaced titles */
-[data-gothamclean-replaced="true"]::before {
+[data-honestlevy-replaced="true"]::before {
   content: "";
   display: inline-block;
   width: 6px;
@@ -27,54 +27,54 @@
 /* These work by detecting the tag text at the start of titles */
 
 /* Recap - Blue */
-[data-gothamclean-replaced="true"][title^="[Recap]"]::before,
-[data-gothamclean-replaced="true"]:has(> :first-child:contains("[Recap]"))::before {
+[data-honestlevy-replaced="true"][title^="[Recap]"]::before,
+[data-honestlevy-replaced="true"]:has(> :first-child:contains("[Recap]"))::before {
   background: #3b82f6;
 }
 
 /* Lesson - Green */
-[data-gothamclean-replaced="true"][title^="[Lesson]"]::before {
+[data-honestlevy-replaced="true"][title^="[Lesson]"]::before {
   background: #22c55e;
 }
 
 /* Guess the Elo - Orange */
-[data-gothamclean-replaced="true"][title^="[Guess the Elo]"]::before {
+[data-honestlevy-replaced="true"][title^="[Guess the Elo]"]::before {
   background: #f97316;
 }
 
 /* News - Red */
-[data-gothamclean-replaced="true"][title^="[News]"]::before {
+[data-honestlevy-replaced="true"][title^="[News]"]::before {
   background: #ef4444;
 }
 
 /* Challenge - Purple */
-[data-gothamclean-replaced="true"][title^="[Challenge]"]::before {
+[data-honestlevy-replaced="true"][title^="[Challenge]"]::before {
   background: #a855f7;
 }
 
 /* Collab - Pink */
-[data-gothamclean-replaced="true"][title^="[Collab]"]::before {
+[data-honestlevy-replaced="true"][title^="[Collab]"]::before {
   background: #ec4899;
 }
 
 /* Road to GM - Gold */
-[data-gothamclean-replaced="true"][title^="[Road to GM]"]::before {
+[data-honestlevy-replaced="true"][title^="[Road to GM]"]::before {
   background: #eab308;
 }
 
 /* Tournament - Teal */
-[data-gothamclean-replaced="true"][title^="[Tournament]"]::before {
+[data-honestlevy-replaced="true"][title^="[Tournament]"]::before {
   background: #14b8a6;
 }
 
 /* Hover effect to show original title (optional enhancement) */
-[data-gothamclean-replaced="true"]:hover {
+[data-honestlevy-replaced="true"]:hover {
   cursor: help;
 }
 
 /* Tooltip showing original title on hover */
-[data-gothamclean-replaced="true"][data-gothamclean-original]:hover::after {
-  content: "Original: " attr(data-gothamclean-original);
+[data-honestlevy-replaced="true"][data-honestlevy-original]:hover::after {
+  content: "Original: " attr(data-honestlevy-original);
   position: absolute;
   left: 0;
   top: 100%;

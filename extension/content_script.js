@@ -1,5 +1,5 @@
 /**
- * GothamClean - Content Script
+ * HonestLevy - Content Script
  *
  * Detects GothamChess video cards on YouTube and replaces clickbait titles
  * with clean, descriptive titles from the cached mapping.
@@ -153,14 +153,14 @@ function processVideoCard(container) {
 
   // Replace the title
   titleElement.textContent = titleData.clean_title;
-  titleElement.setAttribute('data-gothamclean-original', originalTitle);
-  titleElement.setAttribute('data-gothamclean-replaced', 'true');
+  titleElement.setAttribute('data-honestlevy-original', originalTitle);
+  titleElement.setAttribute('data-honestlevy-replaced', 'true');
 
   // Mark as processed
   processedElements.add(container);
   replacedThisSession++;
 
-  console.log(`[GothamClean] Replaced: "${originalTitle}" -> "${titleData.clean_title}"`);
+  console.log(`[HonestLevy] Replaced: "${originalTitle}" -> "${titleData.clean_title}"`);
 
   // Update count in storage
   chrome.runtime.sendMessage({ type: 'incrementReplacedCount', count: 1 });
@@ -189,14 +189,14 @@ function processWatchPageTitle() {
 
   for (const selector of titleSelectors) {
     const titleElement = document.querySelector(selector);
-    if (titleElement && !titleElement.getAttribute('data-gothamclean-replaced')) {
+    if (titleElement && !titleElement.getAttribute('data-honestlevy-replaced')) {
       const originalTitle = titleElement.textContent;
       if (originalTitle !== titleData.clean_title) {
         titleElement.textContent = titleData.clean_title;
-        titleElement.setAttribute('data-gothamclean-original', originalTitle);
-        titleElement.setAttribute('data-gothamclean-replaced', 'true');
+        titleElement.setAttribute('data-honestlevy-original', originalTitle);
+        titleElement.setAttribute('data-honestlevy-replaced', 'true');
 
-        console.log(`[GothamClean] Watch page: "${originalTitle}" -> "${titleData.clean_title}"`);
+        console.log(`[HonestLevy] Watch page: "${originalTitle}" -> "${titleData.clean_title}"`);
         chrome.runtime.sendMessage({ type: 'incrementReplacedCount', count: 1 });
       }
       break;
@@ -246,8 +246,8 @@ function setupObserver() {
 
     if (shouldScan) {
       // Debounce scanning
-      clearTimeout(window.gothamCleanScanTimeout);
-      window.gothamCleanScanTimeout = setTimeout(scanPage, 100);
+      clearTimeout(window.honestLevyScanTimeout);
+      window.honestLevyScanTimeout = setTimeout(scanPage, 100);
     }
   });
 
@@ -267,7 +267,7 @@ function setupObserver() {
 function setupNavigationListener() {
   // YouTube fires this event on SPA navigation
   window.addEventListener('yt-navigate-finish', () => {
-    console.log('[GothamClean] Navigation detected, rescanning...');
+    console.log('[HonestLevy] Navigation detected, rescanning...');
     // Clear processed elements on navigation
     processedElements = new WeakSet();
     setTimeout(scanPage, 500);
@@ -284,7 +284,7 @@ function setupNavigationListener() {
  * Initialize the content script
  */
 async function init() {
-  console.log('[GothamClean] Initializing content script...');
+  console.log('[HonestLevy] Initializing content script...');
 
   // Get titles and settings from background
   try {
@@ -292,14 +292,14 @@ async function init() {
     titlesCache = response.titles || {};
     enabled = response.enabled !== false;
 
-    console.log(`[GothamClean] Loaded ${Object.keys(titlesCache).length} titles, enabled: ${enabled}`);
+    console.log(`[HonestLevy] Loaded ${Object.keys(titlesCache).length} titles, enabled: ${enabled}`);
   } catch (error) {
-    console.error('[GothamClean] Failed to load titles:', error);
+    console.error('[HonestLevy] Failed to load titles:', error);
     return;
   }
 
   if (!enabled) {
-    console.log('[GothamClean] Extension disabled, not scanning');
+    console.log('[HonestLevy] Extension disabled, not scanning');
     return;
   }
 
@@ -319,7 +319,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 
   if (changes.enabled) {
     enabled = changes.enabled.newValue;
-    console.log(`[GothamClean] Enabled changed to: ${enabled}`);
+    console.log(`[HonestLevy] Enabled changed to: ${enabled}`);
     if (enabled) {
       processedElements = new WeakSet();
       scanPage();
@@ -328,7 +328,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 
   if (changes.titles) {
     titlesCache = changes.titles.newValue || {};
-    console.log(`[GothamClean] Titles updated: ${Object.keys(titlesCache).length} titles`);
+    console.log(`[HonestLevy] Titles updated: ${Object.keys(titlesCache).length} titles`);
     processedElements = new WeakSet();
     scanPage();
   }
