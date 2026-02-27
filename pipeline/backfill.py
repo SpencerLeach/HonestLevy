@@ -20,26 +20,62 @@ import anthropic
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+from youtube_transcript_api import YouTubeTranscriptApi
+from youtube_transcript_api.proxies import WebshareProxyConfig
+
 from generate_titles import (
     GOTHAMCHESS_CHANNEL_ID,
     TITLES_JSON_PATH,
-    get_transcript,
     load_prompt,
     load_titles,
     save_titles,
+    TRANSCRIPT_WORD_LIMIT,
 )
 
 # Configuration
 BATCH_SIZE = 50  # Save progress every N videos
-DELAY_BETWEEN_VIDEOS = 0.5  # Seconds between API calls (rate limiting)
-DELAY_BETWEEN_BATCHES = 2  # Seconds between batches
+DELAY_BETWEEN_VIDEOS = 2  # Seconds between requests (can be lower with proxy)
+DELAY_BETWEEN_BATCHES = 3  # Seconds between batches
 PROGRESS_FILE = Path(__file__).parent / "backfill_progress.json"
+
+# Webshare proxy config (set via environment variables)
+WEBSHARE_USERNAME = os.environ.get("WEBSHARE_USERNAME", "")
+WEBSHARE_PASSWORD = os.environ.get("WEBSHARE_PASSWORD", "")
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
+
+
+def get_transcript_with_proxy(video_id: str) -> Optional[str]:
+    """Fetch transcript using Webshare proxy to avoid rate limiting."""
+    try:
+        if WEBSHARE_USERNAME and WEBSHARE_PASSWORD:
+            proxy_config = WebshareProxyConfig(
+                proxy_username=WEBSHARE_USERNAME,
+                proxy_password=WEBSHARE_PASSWORD,
+            )
+            ytt_api = YouTubeTranscriptApi(proxy_config=proxy_config)
+        else:
+            # Fall back to no proxy
+            ytt_api = YouTubeTranscriptApi()
+
+        transcript_data = ytt_api.fetch(video_id, languages=['en'])
+
+        # Join transcript text
+        full_text = " ".join(entry.text for entry in transcript_data)
+
+        # Limit to first N words
+        words = full_text.split()
+        limited_text = " ".join(words[:TRANSCRIPT_WORD_LIMIT])
+
+        return limited_text
+
+    except Exception as e:
+        logger.warning(f"Could not get transcript for {video_id}: {e}")
+        return None
 
 
 def load_progress() -> Dict:
@@ -70,7 +106,7 @@ def get_uploads_playlist_id(youtube) -> str:
 
 
 def fetch_videos_page(youtube, playlist_id: str, page_token: Optional[str] = None) -> Tuple[List[Dict], Optional[str]]:
-    """Fetch a page of videos from the uploads playlist."""
+    """Fetch a page of videos from the uploads playlist, filtering out Shorts."""
     request = youtube.playlistItems().list(
         part="snippet",
         playlistId=playlist_id,
@@ -79,20 +115,60 @@ def fetch_videos_page(youtube, playlist_id: str, page_token: Optional[str] = Non
     )
     response = request.execute()
 
-    videos = []
+    # Get video IDs
+    video_ids = []
+    video_data = {}
     for item in response.get("items", []):
         snippet = item.get("snippet", {})
         video_id = snippet.get("resourceId", {}).get("videoId")
         if video_id:
-            videos.append({
+            video_ids.append(video_id)
+            video_data[video_id] = {
                 "video_id": video_id,
                 "title": snippet.get("title", ""),
                 "description": snippet.get("description", ""),
                 "published": snippet.get("publishedAt", ""),
-            })
+            }
+
+    # Get video durations to filter out Shorts
+    if video_ids:
+        details_response = youtube.videos().list(
+            part="contentDetails",
+            id=",".join(video_ids),
+        ).execute()
+
+        for item in details_response.get("items", []):
+            video_id = item["id"]
+            duration = item.get("contentDetails", {}).get("duration", "PT0S")
+            video_data[video_id]["duration"] = duration
+
+    # Filter: keep only videos > 60 seconds (not Shorts)
+    videos = []
+    for video_id in video_ids:
+        data = video_data[video_id]
+        duration = data.get("duration", "PT0S")
+        # Parse ISO 8601 duration (e.g., PT1M30S, PT10M, PT1H2M3S)
+        seconds = parse_duration(duration)
+        if seconds > 60:
+            videos.append(data)
+            logger.debug(f"Including {data['title'][:40]} ({seconds}s)")
+        else:
+            logger.info(f"Skipping Short: {data['title'][:40]} ({seconds}s)")
 
     next_page_token = response.get("nextPageToken")
     return videos, next_page_token
+
+
+def parse_duration(duration: str) -> int:
+    """Parse ISO 8601 duration to seconds."""
+    import re
+    match = re.match(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?', duration)
+    if not match:
+        return 0
+    hours = int(match.group(1) or 0)
+    minutes = int(match.group(2) or 0)
+    seconds = int(match.group(3) or 0)
+    return hours * 3600 + minutes * 60 + seconds
 
 
 def generate_clean_title(
@@ -173,8 +249,13 @@ def process_video(
 
     logger.info(f"Processing: {original_title} ({video_id})")
 
-    # Get transcript
-    transcript = get_transcript(video_id)
+    # Get transcript - REQUIRED for quality titles
+    transcript = get_transcript_with_proxy(video_id)
+
+    # Skip videos without transcripts (Shorts, etc.) - don't generate garbage
+    if not transcript:
+        logger.info(f"Skipping {video_id}: No transcript available (likely a Short)")
+        return None
 
     # Generate clean title
     result = generate_clean_title(
@@ -194,14 +275,9 @@ def process_video(
             "generated_at": datetime.now(timezone.utc).isoformat(),
         }
 
-    # Fallback if generation failed
-    logger.warning(f"Using fallback title for {video_id}")
-    return {
-        "clean_title": f"[GothamChess] {original_title}",
-        "tag": "Misc",
-        "original_title": original_title,
-        "generated_at": datetime.now(timezone.utc).isoformat(),
-    }
+    # Skip if generation failed - don't save garbage
+    logger.warning(f"Skipping {video_id}: Title generation failed")
+    return None
 
 
 def main():
