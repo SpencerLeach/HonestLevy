@@ -17,6 +17,16 @@ let replacedThisSession = 0;
 let processedElements = new WeakSet();
 
 /**
+ * Check if we're currently on a GothamChess page
+ */
+function isOnGothamChessPage() {
+  const url = window.location.href;
+  return url.includes('/@GothamChess') ||
+         url.includes('/c/GothamChess') ||
+         url.includes('/channel/UCQHX6ViZmPsWiYSFAyS0a3Q');
+}
+
+/**
  * Extract video ID from a YouTube URL
  */
 function extractVideoId(url) {
@@ -41,6 +51,11 @@ function extractVideoId(url) {
  * Check if an element or its context indicates GothamChess
  */
 function isGothamChessVideo(container) {
+  // If we're on a GothamChess page, all videos are GothamChess videos
+  if (isOnGothamChessPage()) {
+    return true;
+  }
+
   // Look for channel name in various locations
   const channelSelectors = [
     'ytd-channel-name',

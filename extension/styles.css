@@ -10,7 +10,7 @@
   position: relative;
 }
 
-/* Optional: Small dot indicator before replaced titles */
+/* Optional: Small dot indicator before replaced titles (uncomment to enable)
 [data-honestlevy-replaced="true"]::before {
   content: "";
   display: inline-block;
@@ -22,6 +22,7 @@
   vertical-align: middle;
   flex-shrink: 0;
 }
+*/
 
 /* Tag color coding for different categories */
 /* These work by detecting the tag text at the start of titles */
