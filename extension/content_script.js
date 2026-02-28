@@ -117,6 +117,11 @@ function findTitleElement(container) {
     'yt-formatted-string#video-title',
     '.title-and-badge a',
     'span#video-title',
+    // New yt-lockup-view-model selectors (2025 YouTube redesign)
+    'a.yt-lockup-metadata-view-model-wiz__title',
+    'a.yt-lockup-metadata-view-model__title',
+    '.yt-lockup-metadata-view-model-wiz__title',
+    '.yt-lockup-metadata-view-model__title',
   ];
 
   for (const selector of titleSelectors) {
@@ -161,7 +166,7 @@ function processVideoCard(container) {
 
   // Check if we have a clean title for this video - if so, it's a GothamChess video
   const titleData = titlesCache[videoId];
-  if (!titleData) return;
+  if (!titleData) return;  // Not a GothamChess video
 
   // Find and replace the title element
   const titleElement = findTitleElement(container);
@@ -241,7 +246,8 @@ function scanPage() {
   const containerSelectors = [
     'ytd-rich-item-renderer',       // Home page / channel page grid
     'ytd-video-renderer',           // Search results
-    'ytd-compact-video-renderer',   // Sidebar / suggested videos
+    'ytd-compact-video-renderer',   // Sidebar / suggested videos (old)
+    'yt-lockup-view-model',         // Sidebar / suggested videos (new)
     'ytd-grid-video-renderer',      // Channel page grid (older style)
     'ytd-playlist-video-renderer',  // Playlist items
   ];
