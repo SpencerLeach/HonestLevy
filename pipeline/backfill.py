@@ -38,7 +38,7 @@ DELAY_BETWEEN_VIDEOS = 2  # Seconds between requests (can be lower with proxy)
 DELAY_BETWEEN_BATCHES = 3  # Seconds between batches
 PROGRESS_FILE = Path(__file__).parent / "backfill_progress.json"
 
-# Webshare proxy config (set via environment variables)
+# Webshare rotating residential proxy credentials
 WEBSHARE_USERNAME = os.environ.get("WEBSHARE_USERNAME", "")
 WEBSHARE_PASSWORD = os.environ.get("WEBSHARE_PASSWORD", "")
 
@@ -217,13 +217,17 @@ Generate the clean title JSON."""
                 if "tag" in result and "title" in result:
                     return result
             except json.JSONDecodeError:
-                json_match = re.search(r'\{[^}]+\}', response_text)
+                # Try to extract JSON from response with regex
+                json_match = re.search(r'\{.*?\}', response_text, re.DOTALL)
                 if json_match:
-                    result = json.loads(json_match.group())
-                    if "tag" in result and "title" in result:
-                        return result
+                    try:
+                        result = json.loads(json_match.group())
+                        if "tag" in result and "title" in result:
+                            return result
+                    except json.JSONDecodeError:
+                        pass  # Fall through to warning
 
-            logger.warning(f"Invalid response format (attempt {attempt + 1}): {response_text}")
+            logger.warning(f"Invalid response format (attempt {attempt + 1}): {response_text[:100]}")
 
         except anthropic.APIError as e:
             logger.warning(f"API error (attempt {attempt + 1}): {e}")

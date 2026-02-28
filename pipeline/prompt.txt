@@ -29,5 +29,20 @@ TITLE RULES:
 - Be factual and specific — this title should help someone browsing decide if they want to watch
 - If the video covers multiple games, focus on the most notable one or the event name
 
+COMMON TRANSCRIPT CORRECTIONS — fix these frequent speech-to-text errors:
+- "Grock" → "Grok" (xAI chatbot)
+- "England Gambit" → "Englund Gambit" (chess opening named after Fritz Englund)
+- "Fisher Random" → "Fischer Random" (Bobby Fischer)
+- "Nobec/Noirbbec Abdul" → "Nodirbek Abdusattorov" (Uzbek World Rapid Champion)
+- "Levoneronian" → "Levon Aronian" (Armenian GM)
+- "Pragna/Pragananda/Pragnandh" → "Praggnanandhaa" (Indian GM, double 'g' and double 'a')
+- "Wayi/Weii" → "Wei Yi" (Chinese GM)
+- "Kukeshyamov/Gesh" → "Gukesh" (Indian World Champion)
+- "Sindarov/Sundarov/Suturov" → "Javokhir Sindarov" (Uzbek GM)
+- "Erdogmush/Erdogmas" → "Yagiz Kaan Erdogmus" (Turkish prodigy)
+- "03" → "o3" (OpenAI model, letter o not zero)
+- "Speech Chess" → "Speed Chess" (tournament name)
+- "Nerdski" → "Naroditsky" (Daniel Naroditsky)
+
 OUTPUT FORMAT (strict JSON, nothing else):
 {"tag": "Recap", "title": "Carlsen vs Firouzja at Norway Chess: Sicilian Najdorf"}
