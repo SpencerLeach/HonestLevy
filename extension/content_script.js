@@ -143,10 +143,7 @@ function findVideoLink(container) {
  * Replace the title of a video card if it's a GothamChess video
  */
 function processVideoCard(container) {
-  // Check if it's a GothamChess video
-  if (!isGothamChessVideo(container)) return;
-
-  // Find video link and extract ID
+  // Find video link and extract ID first
   const videoLink = findVideoLink(container);
   const videoId = extractVideoId(videoLink);
   if (!videoId) return;
@@ -154,7 +151,7 @@ function processVideoCard(container) {
   // Skip if this container already has this video processed
   if (processedVideoIds.get(container) === videoId) return;
 
-  // Check if we have a clean title for this video
+  // Check if we have a clean title for this video - if so, it's a GothamChess video
   const titleData = titlesCache[videoId];
   if (!titleData) return;
 

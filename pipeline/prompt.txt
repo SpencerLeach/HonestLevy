@@ -38,7 +38,7 @@ Player names:
 - "Levoneronian/Le Vaughn Aronian" → "Levon Aronian" (Armenian GM)
 - "Wayi/Weii" → "Wei Yi" (Chinese GM)
 - "Sindarov/Sundarov/Suturov" → "Javokhir Sindarov" (Uzbek GM)
-- "Erdogmush/Erdogmas" → "Yagiz Kaan Erdogmus" (Turkish prodigy)
+- "Erdogmush/Erdogmas/Erdomush" → "Yagiz Kaan Erdogmus" (Turkish prodigy)
 - "Nepo/Nepomniashi" → "Ian Nepomniachtchi" (Russian GM)
 - "Firuzja/Firoozja" → "Alireza Firouzja" (French GM)
 - "Nerdski/Narodinsky" → "Daniel Naroditsky" (American GM)
