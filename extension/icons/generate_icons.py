@@ -12,8 +12,8 @@ import os
 # Icon sizes
 SIZES = [16, 48, 128]
 
-# Colors - chess.com "great move" style
-BG_COLOR = (91, 155, 213)  # Blue (#5b9bd5)
+# Colors - chess.com "brilliant" style
+BG_COLOR = (27, 172, 166)  # Teal (#1baca6)
 TEXT_COLOR = (255, 255, 255)
 
 def create_icon(size):
@@ -42,7 +42,7 @@ def create_icon(size):
             # Fall back to default font
             font = ImageFont.load_default()
 
-    text = "!"
+    text = "!!"
     bbox = draw.textbbox((0, 0), text, font=font)
     text_width = bbox[2] - bbox[0]
     text_height = bbox[3] - bbox[1]
