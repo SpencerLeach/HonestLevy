@@ -153,7 +153,7 @@ def fetch_videos_page(youtube, playlist_id: str, page_token: Optional[str] = Non
             videos.append(data)
             logger.debug(f"Including {data['title'][:40]} ({seconds}s)")
         else:
-            logger.info(f"Skipping Short: {data['title'][:40]} ({seconds}s)")
+            logger.debug(f"Skipping Short: {data['title'][:40]} ({seconds}s)")
 
     next_page_token = response.get("nextPageToken")
     return videos, next_page_token
@@ -248,17 +248,17 @@ def process_video(
 
     # Skip deleted/private videos
     if original_title in ["Deleted video", "Private video"]:
-        logger.info(f"Skipping {video_id}: {original_title}")
+        logger.debug(f"Skipping {video_id}: {original_title}")
         return None
 
-    logger.info(f"Processing: {original_title} ({video_id})")
+    logger.debug(f"Processing: {original_title} ({video_id})")
 
     # Get transcript - REQUIRED for quality titles
     transcript = get_transcript_with_proxy(video_id)
 
     # Skip videos without transcripts (Shorts, etc.) - don't generate garbage
     if not transcript:
-        logger.info(f"Skipping {video_id}: No transcript available (likely a Short)")
+        logger.debug(f"Skipping {video_id}: No transcript available")
         return None
 
     # Generate clean title
@@ -280,7 +280,7 @@ def process_video(
         }
 
     # Skip if generation failed - don't save garbage
-    logger.warning(f"Skipping {video_id}: Title generation failed")
+    logger.debug(f"Skipping {video_id}: Title generation failed")
     return None
 
 
@@ -327,15 +327,14 @@ def main():
                 logger.info("No more videos to process")
                 break
 
-            logger.info(f"Fetched {len(videos)} videos (page token: {page_token})")
+            logger.debug(f"Fetched {len(videos)} videos")
 
             # Process each video
             for video in videos:
                 video_id = video["video_id"]
 
-                # Skip if already processed
+                # Skip if already processed (silent)
                 if video_id in titles:
-                    logger.debug(f"Skipping {video_id} (already processed)")
                     continue
 
                 # Process video
