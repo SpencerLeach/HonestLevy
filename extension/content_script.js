@@ -14,7 +14,7 @@ const GOTHAMCHESS_NAMES = ['gothamchess', 'gotham chess', 'levy rozman'];
 let titlesCache = {};
 let enabled = true;
 let replacedThisSession = 0;
-let processedElements = new WeakSet();
+let processedVideoIds = new Map();  // container -> videoId (to detect content changes)
 
 /**
  * Check if we're currently on a GothamChess page
@@ -143,9 +143,6 @@ function findVideoLink(container) {
  * Replace the title of a video card if it's a GothamChess video
  */
 function processVideoCard(container) {
-  // Skip if already processed
-  if (processedElements.has(container)) return;
-
   // Check if it's a GothamChess video
   if (!isGothamChessVideo(container)) return;
 
@@ -153,6 +150,9 @@ function processVideoCard(container) {
   const videoLink = findVideoLink(container);
   const videoId = extractVideoId(videoLink);
   if (!videoId) return;
+
+  // Skip if this container already has this video processed
+  if (processedVideoIds.get(container) === videoId) return;
 
   // Check if we have a clean title for this video
   const titleData = titlesCache[videoId];
@@ -171,8 +171,8 @@ function processVideoCard(container) {
   titleElement.setAttribute('data-honestlevy-original', originalTitle);
   titleElement.setAttribute('data-honestlevy-replaced', 'true');
 
-  // Mark as processed
-  processedElements.add(container);
+  // Mark as processed with this video ID
+  processedVideoIds.set(container, videoId);
   replacedThisSession++;
 
   console.log(`[HonestLevy] Replaced: "${originalTitle}" -> "${titleData.clean_title}"`);
@@ -253,7 +253,13 @@ function setupObserver() {
     let shouldScan = false;
 
     for (const mutation of mutations) {
+      // Trigger on added nodes
       if (mutation.addedNodes.length > 0) {
+        shouldScan = true;
+        break;
+      }
+      // Also trigger on attribute changes to video-related elements
+      if (mutation.type === 'attributes' && mutation.attributeName === 'href') {
         shouldScan = true;
         break;
       }
@@ -271,6 +277,8 @@ function setupObserver() {
   observer.observe(targetNode, {
     childList: true,
     subtree: true,
+    attributes: true,
+    attributeFilter: ['href'],  // Watch for link changes (indicates new video)
   });
 
   return observer;
@@ -284,13 +292,13 @@ function setupNavigationListener() {
   window.addEventListener('yt-navigate-finish', () => {
     console.log('[HonestLevy] Navigation detected, rescanning...');
     // Clear processed elements on navigation
-    processedElements = new WeakSet();
+    processedVideoIds.clear();
     setTimeout(scanPage, 500);
   });
 
   // Also listen for popstate (back/forward)
   window.addEventListener('popstate', () => {
-    processedElements = new WeakSet();
+    processedVideoIds.clear();
     setTimeout(scanPage, 500);
   });
 }
@@ -336,7 +344,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     enabled = changes.enabled.newValue;
     console.log(`[HonestLevy] Enabled changed to: ${enabled}`);
     if (enabled) {
-      processedElements = new WeakSet();
+      processedVideoIds.clear();
       scanPage();
     }
   }
@@ -344,7 +352,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
   if (changes.titles) {
     titlesCache = changes.titles.newValue || {};
     console.log(`[HonestLevy] Titles updated: ${Object.keys(titlesCache).length} titles`);
-    processedElements = new WeakSet();
+    processedVideoIds.clear();
     scanPage();
   }
 });
