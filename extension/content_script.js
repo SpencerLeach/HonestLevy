@@ -201,12 +201,16 @@ function processWatchPageTitle() {
 
   for (const selector of titleSelectors) {
     const titleElement = document.querySelector(selector);
-    if (titleElement && !titleElement.getAttribute('data-honestlevy-replaced')) {
+    if (titleElement) {
+      // Check if already replaced for THIS video
+      const replacedForVideo = titleElement.getAttribute('data-honestlevy-video-id');
+      if (replacedForVideo === videoId) return;
+
       const originalTitle = titleElement.textContent;
       if (originalTitle !== titleData.clean_title) {
         titleElement.textContent = titleData.clean_title;
         titleElement.setAttribute('data-honestlevy-original', originalTitle);
-        titleElement.setAttribute('data-honestlevy-replaced', 'true');
+        titleElement.setAttribute('data-honestlevy-video-id', videoId);
 
         console.log(`[HonestLevy] Watch page: "${originalTitle}" -> "${titleData.clean_title}"`);
         chrome.runtime.sendMessage({ type: 'incrementReplacedCount', count: 1 });
