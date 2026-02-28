@@ -17,6 +17,14 @@ let replacedThisSession = 0;
 let processedVideoIds = new Map();  // container -> videoId (to detect content changes)
 
 /**
+ * Check if an element is visible in the viewport
+ */
+function isElementVisible(element) {
+  const rect = element.getBoundingClientRect();
+  return rect.width > 0 && rect.height > 0 && rect.top < window.innerHeight && rect.bottom > 0;
+}
+
+/**
  * Check if we're currently on a GothamChess page
  */
 function isOnGothamChessPage() {
@@ -159,6 +167,9 @@ function processVideoCard(container) {
   const titleElement = findTitleElement(container);
   if (!titleElement) return;
 
+  // Only process visible elements to avoid cached/hidden DOM nodes
+  if (!isElementVisible(container)) return;
+
   // Store original title for potential toggle feature
   const originalTitle = titleElement.textContent;
   if (originalTitle === titleData.clean_title) return;  // Already replaced
@@ -172,7 +183,7 @@ function processVideoCard(container) {
   processedVideoIds.set(container, videoId);
   replacedThisSession++;
 
-  console.log(`[HonestLevy] Replaced: "${originalTitle}" -> "${titleData.clean_title}"`);
+  console.log(`[HonestLevy] Replaced (${videoId}): "${originalTitle.substring(0, 30)}..." -> "${titleData.clean_title.substring(0, 30)}..."`);
 
   // Update count in storage
   chrome.runtime.sendMessage({ type: 'incrementReplacedCount', count: 1 });
@@ -302,6 +313,13 @@ function setupNavigationListener() {
     processedVideoIds.clear();
     setTimeout(scanPage, 500);
   });
+
+  // Rescan on scroll (debounced) to catch newly visible elements
+  let scrollTimeout;
+  window.addEventListener('scroll', () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(scanPage, 200);
+  }, { passive: true });
 }
 
 /**
