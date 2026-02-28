@@ -197,7 +197,7 @@ function processVideoCard(container) {
 /**
  * Process the watch page title (when viewing a GothamChess video)
  */
-function processWatchPageTitle() {
+function processWatchPageTitle(retryCount = 0) {
   // Check if we're on a watch page
   const url = window.location.href;
   const videoId = extractVideoId(url);
@@ -223,6 +223,14 @@ function processWatchPageTitle() {
       if (replacedForVideo === videoId) return;
 
       const originalTitle = titleElement.textContent;
+      // Skip if title is empty (not loaded yet)
+      if (!originalTitle || originalTitle.trim() === '') {
+        if (retryCount < 10) {
+          setTimeout(() => processWatchPageTitle(retryCount + 1), 200);
+        }
+        return;
+      }
+
       if (originalTitle !== titleData.clean_title) {
         titleElement.textContent = titleData.clean_title;
         titleElement.setAttribute('data-honestlevy-original', originalTitle);
@@ -231,8 +239,13 @@ function processWatchPageTitle() {
         console.log(`[HonestLevy] Watch page: "${originalTitle}" -> "${titleData.clean_title}"`);
         chrome.runtime.sendMessage({ type: 'incrementReplacedCount', count: 1 });
       }
-      break;
+      return;
     }
+  }
+
+  // Title element not found yet, retry
+  if (retryCount < 10) {
+    setTimeout(() => processWatchPageTitle(retryCount + 1), 200);
   }
 }
 
