@@ -30,19 +30,31 @@ TITLE RULES:
 - If the video covers multiple games, focus on the most notable one or the event name
 
 COMMON TRANSCRIPT CORRECTIONS — fix these frequent speech-to-text errors:
-- "Grock" → "Grok" (xAI chatbot)
-- "England Gambit" → "Englund Gambit" (chess opening named after Fritz Englund)
-- "Fisher Random" → "Fischer Random" (Bobby Fischer)
-- "Nobec/Noirbbec Abdul" → "Nodirbek Abdusattorov" (Uzbek World Rapid Champion)
-- "Levoneronian" → "Levon Aronian" (Armenian GM)
+Player names:
+- "Gesh/Gukesh Yamaraj" → "Gukesh Dommaraju" (Indian World Champion 2024)
+- "Nobec/Noirbbec/Abdusov/Sutrorov" → "Nodirbek Abdusattorov" (Uzbek World Rapid Champion)
+- "Ordinary Gy/Arjuneris/Arigaisi" → "Arjun Erigaisi" (Indian GM)
 - "Pragna/Pragananda/Pragnandh" → "Praggnanandhaa" (Indian GM, double 'g' and double 'a')
+- "Levoneronian/Le Vaughn Aronian" → "Levon Aronian" (Armenian GM)
 - "Wayi/Weii" → "Wei Yi" (Chinese GM)
-- "Kukeshyamov/Gesh" → "Gukesh" (Indian World Champion)
 - "Sindarov/Sundarov/Suturov" → "Javokhir Sindarov" (Uzbek GM)
 - "Erdogmush/Erdogmas" → "Yagiz Kaan Erdogmus" (Turkish prodigy)
-- "03" → "o3" (OpenAI model, letter o not zero)
+- "Nepo/Nepomniashi" → "Ian Nepomniachtchi" (Russian GM)
+- "Firuzja/Firoozja" → "Alireza Firouzja" (French GM)
+- "Nerdski/Narodinsky" → "Daniel Naroditsky" (American GM)
+- "Dubov" → "Daniil Dubov" (Russian GM)
+- "Hikaru/Nakamura" → "Hikaru Nakamura" (American GM, use full name on first mention)
+- "Magnus/Carlsen" → "Magnus Carlsen" (Norwegian World Champion)
+
+Chess terms:
+- "England Gambit" → "Englund Gambit" (named after Fritz Englund)
+- "Fisher Random" → "Fischer Random" (named after Bobby Fischer)
 - "Speech Chess" → "Speed Chess" (tournament name)
-- "Nerdski" → "Naroditsky" (Daniel Naroditsky)
+- "Candidate's" → "Candidates" (tournament name, no apostrophe)
+
+Other:
+- "Grock" → "Grok" (xAI chatbot)
+- "03" → "o3" (OpenAI model, letter o not zero)
 
 OUTPUT FORMAT (strict JSON, nothing else):
 {"tag": "Recap", "title": "Carlsen vs Firouzja at Norway Chess: Sicilian Najdorf"}
